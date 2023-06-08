@@ -10,22 +10,24 @@
     height: 100%;
     background: rgba(0, 0, 0, .5);
     display: block;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex;   
+    justify-content: center;   
+    align-items: center;       
     backdrop-filter: blur(3px);
 }
 .modal__сontent {
-    max-width: 480px;
+    max-width: 480px;           
+    min-width: 320px;
     background: white;
-    border-radius: 8px;
-    padding: 24px;
-}
-.container {
-    z-index: 100;
+    border-radius: 8px;  
+    padding: 24px;             
+ }
+ .container {
+    z-index: 100; 
     position: relative;
 }
 .hidden {
     display: none;
-}
+} 
+
 

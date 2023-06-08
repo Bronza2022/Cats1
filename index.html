@@ -11,54 +11,61 @@
 
     <script defer src="./index.js"></script>
     <link rel="stylesheet" href="./styles.css">
-
     <title>Document</title>
 </head>
-<body>
-    <div class="container py-5">
+<body>  
+      <div class="container py-5">
         <h1 class="text-center mb-4">Породы кошек</h1>
         <div class="d-flex justify-content-center">
         <button 
-        data-action="${ACTIONS.DELETE}" 
-        type="button" 
-        class="btn btn-success mb-2"
-        >
-        Add
+          data-openModal="createCat"   
+          type="button" 
+          class="btn btn-success mb-2"
+         >
+          Add
          </button>
-      </div>
-        
-      <hr class="mb-5"/>
-        <div data-wr class="d-flex flex-wrap"></div>
-     </div>
-
-    <div class="modal">
-        <div class="modal__content"> 
-            <!-- <h3 class="text-center mb-3">Create new cat</h3>                    -->
-            <form>
-
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"/>
-              <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-            </div>
-
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Password</label>
-              <input type="password" class="form-control" id="exampleInputPassword1"/>
-            </div>
-
-            <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="exampleCheck1"/>
-              <label class="form-check-label" for="exampleCheck1">Check me out</label>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
         </div>
-    </div>   
+      <hr class="mb-5" />
+        <div data-wr class="d-flex flex-wrap"></div>
+     </div>    
+
+           <div data-modalWr class="modal hidden">
+             <div data-modalContent class="modal__сontent">
+    
+        <h3 class="text-center mb-3">Create new cat</h3>
+        <form name="createCatForm">
+
+      <div class="mb-3">
+        <input type="number" name="id" required placeholder="Id" class="form-control"/>
+      </div>
+
+      <div class="mb-3">
+        <input type="text" name="name" required placeholder="Name" class="form-control"/>
+      </div>
+
+      <div class="mb-3">
+        <input type="number" name="age" placeholder="Age" class="form-control"/>
+      </div>
+
+      <div class="mb-3">
+        <input type="text" name="description" placeholder="Description" class="form-control"/>
+      </div>
+
+      <div class="mb-3">
+        <input type="text" name="image" placeholder="Image url" class="form-control"/>
+      </div>
+
+      <div class="mb-3">
+        <input type="range" name="rate" min="1" max="10" />
+      </div>
+
+      <div class="mb-3 form-check">
+        <input type="checkbox" name="favorite" class="form-check-input" id="exampleCheck1"/>
+        <label class="form-check-label" for="exampleCheck1">favorite</label>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+    </div>
+    </div>
 </body>
-</html>
-
-
-
- 
+</html> 

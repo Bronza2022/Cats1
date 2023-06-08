@@ -1,5 +1,10 @@
 console.log('work')
 const $wr = document.querySelector('[data-wr]')
+const $createCatForm = document.forms.createCatForm
+const $modalWr = document.querySelector('[data-modalWr]')
+const $modalContent = document.querySelector('[data-modalContent]')
+
+console.log($modalContent, $modalWr)
 
 const ACTIONS = {
   DETAIL: 'detail',
@@ -7,8 +12,8 @@ const ACTIONS = {
 }
 
 const getCatHTML = (cat) => `
-    <div data-cat-id="${cat.id}" class="card mb-3 mx-2" style="width: 18rem;">
-      <img src="${cat.image}" class="card-img-top" alt="${cat.name}"> 
+    <div data-cat-id="${cat.id}" class="card mb-3 mx-2" style="width: 18rem">
+      <img src="${cat.image}" class="card-img-top" alt="${cat.name}"/> 
       <div class="card-body">
         <h5 class="card-title">${cat.name}</h5>
         <p class="card-text">${cat.description}</p>
@@ -18,18 +23,6 @@ const getCatHTML = (cat) => `
     </div>
     `
 
-// *********** Вопрос: мы сделали без join 27.05.23. Зачем join? Нет разницы. ************
-// fetch('https://cats.petiteweb.dev/api/single/Bronza2022/show')
-//   .then((res) => res.json())
-//   .then((data) => {
-//     $wr.insertAdjacentHTML(
-//       'afterbegin',
-//       data.map((cat) => getCatHTML(cat)),
-//      )
-//     console.log({ data })
-//   })
-
-// Вариант с лекции
 fetch('https://cats.petiteweb.dev/api/single/Bronza2022/show')
   .then((res) => res.json())
   .then((data) => {
@@ -37,18 +30,12 @@ fetch('https://cats.petiteweb.dev/api/single/Bronza2022/show')
       'afterbegin',
       data.map((cat) => getCatHTML(cat)).join(''),
     )
-    console.log({ data })
   })
 
 $wr.addEventListener('click', (e) => {
   if (e.target.dataset.action === ACTIONS.DELETE) {
-    console.log(e.target)
-
     const $catWr = e.target.closest('[data-cat-id]')
-    const catId = $catWr.dataset.catId // до деструктуризации
-    // const { catId } = $catWr.dataset // после деструктуризации
-
-    console.log({ catId })
+    const catId = $catWr.dataset.catId
 
     fetch(`https://cats.petiteweb.dev/api/single/bronza2022/delete/${catId}`, {
       method: 'DELETE',
@@ -56,7 +43,48 @@ $wr.addEventListener('click', (e) => {
       if (res.status === 200) {
         return $catWr.remove()
       }
-      alert('Удаление кота с id = ${cat.id} не удалось')
+      alert(`Удаление кота с id = ${catId} не удалось`)
     })
   }
 })
+
+const submitCreateCatHandler = (e) => {
+  e.preventDefault()
+
+  let formDataObject = Object.fromEntries(new FormData(e.target).entries())
+
+  formDataObject = {
+    ...formDataObject,
+    id: +formDataObject.id,
+    rate: +formDataObject.rate,
+    age: +formDataObject.age,
+    favorite: !!formDataObject.favorite,
+  }
+
+  fetch('https://cats.petiteweb.dev/api/single/Bronza2022/add/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formDataObject),
+  }).then((res) => {
+    if (res.status === 200) {
+      return $wr.insertAdjacentHTML(
+        'afterbegin',
+        getCatHTML(formDataObject),
+      )
+    }
+    throw Error('Ошибка при создании кота')
+  }).catch(alert)
+}
+
+const openModalHandler = (e) => {
+  const targetModalName = e.target.dataset.openmodal
+
+  if (targetModalName === 'createCat') {
+    $modalWr.classList.remove('hidden')
+
+    $createCatForm.addEventListener('submit', submitCreateCatHandler)
+  }
+}
+document.addEventListener('click', openModalHandler)
