@@ -88,3 +88,10 @@ const openModalHandler = (e) => {
   }
 }
 document.addEventListener('click', openModalHandler)
+
+document.addEventListener('keydown', (e) => {
+  console.log(e)
+  if (e.key === 'Escape') {
+    $modalWr.classList.add('hidden')
+  }
+})
