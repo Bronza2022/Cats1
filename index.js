@@ -13,7 +13,7 @@ const ACTIONS = {
 
 const getCatHTML = (cat) => `
     <div data-cat-id="${cat.id}" class="card mb-3 mx-2" style="width: 18rem">
-      <img src="${cat.image}" class="card-img-top" alt="${cat.name}"/> 
+      <img src="${cat.image}" class="card-img-top" alt="${cat.name}"/>
       <div class="card-body">
         <h5 class="card-title">${cat.name}</h5>
         <p class="card-text">${cat.description}</p>
@@ -78,20 +78,31 @@ const submitCreateCatHandler = (e) => {
   }).catch(alert)
 }
 
+const clickModalWrHandler = (e) => {
+  if (e.target === $modalWr) {
+    $modalWr.classList.add('hidden')
+    $modalWr.removeEventListener('click', clickModalWrHandler)
+    $createCatForm.removeEventListener('submit', submitCreateCatHandler)
+  }
+}
+
 const openModalHandler = (e) => {
   const targetModalName = e.target.dataset.openmodal
-
   if (targetModalName === 'createCat') {
     $modalWr.classList.remove('hidden')
-
+    $modalWr.addEventListener('click', clickModalWrHandler)
     $createCatForm.addEventListener('submit', submitCreateCatHandler)
   }
 }
+
 document.addEventListener('click', openModalHandler)
 
 document.addEventListener('keydown', (e) => {
   console.log(e)
+
   if (e.key === 'Escape') {
     $modalWr.classList.add('hidden')
+    $modalWr.removeEventListener('click', clickModalWrHandler)
+    $createCatForm.removeEventListener('submit', submitCreateCatHandler)
   }
 })
