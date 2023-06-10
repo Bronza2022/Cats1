@@ -106,3 +106,4 @@ document.addEventListener('keydown', (e) => {
     $createCatForm.removeEventListener('submit', submitCreateCatHandler)
   }
 })
+// ----------------
