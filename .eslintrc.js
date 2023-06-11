@@ -18,5 +18,6 @@ module.exports = {
     'no-alert': 0,
     'consistent-return': 0,
     'no-template-curly-in-string': 0,
+    'max-len': ['error', { ignoreComments: true }],
   },
 }

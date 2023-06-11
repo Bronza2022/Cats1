@@ -1,10 +1,44 @@
 console.log('work')
 const $wr = document.querySelector('[data-wr]')
-const $createCatForm = document.forms.createCatForm
-const $modalWr = document.querySelector('[data-modalWr]')
-const $modalContent = document.querySelector('[data-modalContent]')
+//const $createCatForm = document.forms.createCatForm
+const $modalWr = document.querySelector('[data-modalWr]') // 2.8 Здесь будем обращаться напрямую к элементам
+const $modalContent = document.querySelector('[data-modalContent]') // 2.9 Здесь будем обращаться напрямую к элементам
 
-console.log($modalContent, $modalWr)
+console.log($modalContent, $modalWr) // 2.10 Проверяем, нашли мы элементы или нет.
+
+const getCreateCatFormHTML = () => `<h3 class="text-center mb-3">Create new cat</h3>
+        <form name="createCatForm">
+
+        <div class="mb-3">
+          <input type="number" name="id" required placeholder="Id" class="form-control"/>
+        </div>
+  
+        <div class="mb-3">
+          <input type="text" name="name" required placeholder="Name" class="form-control"/>
+        </div>
+  
+        <div class="mb-3">
+          <input type="number" name="age" placeholder="Age" class="form-control"/>
+        </div>
+  
+        <div class="mb-3">
+          <input type="text" name="description" placeholder="Description" class="form-control"/>
+        </div>
+  
+        <div class="mb-3">
+          <input type="text" name="image" placeholder="Image url" class="form-control"/>
+        </div>
+  
+        <div class="mb-3">
+          <input type="range" name="rate" min="1" max="10" />
+        </div>
+  
+        <div class="mb-3 form-check">
+          <input type="checkbox" name="favorite" class="form-check-input" id="exampleCheck1"/>
+          <label class="form-check-label" for="exampleCheck1">favorite</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+        </form>` // 5.1
 
 const ACTIONS = {
   DETAIL: 'detail',
@@ -17,8 +51,12 @@ const getCatHTML = (cat) => `
       <div class="card-body">
         <h5 class="card-title">${cat.name}</h5>
         <p class="card-text">${cat.description}</p>
-        <button data-action="${ACTIONS.DETAIL}" type="button" class="btn btn-primary">Detail</button>
-        <button data-action="${ACTIONS.DELETE}" type="button" class="btn btn-danger">Delete</button>
+        <button data-action="${ACTIONS.DETAIL}" 
+        type="button" 
+        class="btn btn-primary">Detail</button>
+        <button data-action="${ACTIONS.DELETE}" 
+        type="button" 
+        class="btn btn-danger">Delete</button>
         </div>
     </div>
     `
@@ -48,12 +86,23 @@ $wr.addEventListener('click', (e) => {
   }
 })
 
-const submitCreateCatHandler = (e) => {
+const formatCreateFormData = (formDataObject) => {  // 6.3
+return {                    
+     ...formDataObject,
+    id: +formDataObject.id,
+    rate: +formDataObject.rate,
+    age: +formDataObject.age,
+    favorite: !!formDataObject.favorite,
+  }
+}
+
+
+const submitCreateCatHandler = (e) => { // 2.12 Создадим 'const submitCreatCatHandler'
   e.preventDefault()
 
-  let formDataObject = Object.fromEntries(new FormData(e.target).entries())
+  let formDataObject = formatCreateFormData(Object.fromEntries(new FormData(e.target).entries())) // 6.4
 
-  formDataObject = {
+  formDataObject = {   // 6.2
     ...formDataObject,
     id: +formDataObject.id,
     rate: +formDataObject.rate,
@@ -78,32 +127,49 @@ const submitCreateCatHandler = (e) => {
   }).catch(alert)
 }
 
-const clickModalWrHandler = (e) => {
-  if (e.target === $modalWr) {
-    $modalWr.classList.add('hidden')
-    $modalWr.removeEventListener('click', clickModalWrHandler)
-    $createCatForm.removeEventListener('submit', submitCreateCatHandler)
+const clickModalWrHandler = (e) => { // 4.1
+  if (e.target === $modalWr) { // 4.5
+    $modalWr.classList.add('hidden') // 4.6  Закрываем модалку
+    $modalWr.removeEventListener('click', clickModalWrHandler) // 4.7
+    $modalContent.innerHTML = '' // 5.5 Когда модалка закрывается, чистится все содержимое.
+    // $createCatForm.removeEventListener('submit', submitCreateCatHandler) // 4.8. 5.4 Строка не нужна, потому что мы будем физически удалять элементы с разметки и браузер будет удалять все обработчики события за нас.
   }
 }
 
-const openModalHandler = (e) => {
-  const targetModalName = e.target.dataset.openmodal
-  if (targetModalName === 'createCat') {
-    $modalWr.classList.remove('hidden')
-    $modalWr.addEventListener('click', clickModalWrHandler)
-    $createCatForm.addEventListener('submit', submitCreateCatHandler)
+const openModalHandler = (e) => { // 2.3 Открытие модального окна. Функция, которую мы укажем по событию (e)
+  const targetModalName = e.target.dataset.openmodal // 2.4. 'dataset' будет называться 'openmodal'
+  if (targetModalName === 'createCat') { // 2.5 «Если это строка 'createCat', то будем делать какие-то действия.
+    $modalWr.classList.remove('hidden') // 2.11 по умолчанию есть класс 'hidden' и его надо удалить
+    $modalWr.addEventListener('click', clickModalWrHandler) // 4.2
+
+    $modalContent.insertAdjacentHTML('afterbegin', getCreateCatFormHTML()) // 5.2
+    const $createCatForm = document.forms.createCatForm // 5.3
+    $createCatForm.addEventListener('submit', submitCreateCatHandler) // 2.13 обработчик события
+    $createCatForm.addEventListener('change', (changeEvent) => { // 6.1
+      //console.log(changeEvent) // 6.6 удаляем
+      const formattedData = formatCreateFormData(Object.fromEntries(new FormData($createCatForm).entries())) // 6.5
+    
+      localStorage.setItem('createCatForm', JSON.stringify(formattedData))
+      //console.log({ formattedData });
+    })
   }
 }
 
-document.addEventListener('click', openModalHandler)
+document.addEventListener('click', openModalHandler) // 2.2 обработчик события, который отвечает за обработку 'click' и вызывает функцию 'openModalHandler'.
 
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', (e) => { // 3.1 Вешаем обработчик события, которым отлавливаем событие 'keydown'.
   console.log(e)
 
   if (e.key === 'Escape') {
-    $modalWr.classList.add('hidden')
-    $modalWr.removeEventListener('click', clickModalWrHandler)
-    $createCatForm.removeEventListener('submit', submitCreateCatHandler)
+    $modalWr.classList.add('hidden') // 3.2 Чтобы закрыть модалку добавляем класс 'hidden'.
+    $modalWr.removeEventListener('click', clickModalWrHandler) // 4.3
+    // $createCatForm.removeEventListener('submit', submitCreateCatHandler) // 4.4. 5.4 Строка не нужна, потому что мы будем физически удалять элементы с разметки и браузер будет удалять все обработчики события за нас.
+    $modalContent.innerHTML = '' // 5.5 Когда модалка закрывается, чистится все содержимое.
   }
 })
-// ----------------
+
+// 2. Функция открытия модалки (п. 2.2-2.13)
+// 3. функция закрытия модалки клавишей Esc (п. 3.1-3.2)
+// 4. функция закрытия модалки кликом по размытой области (п. 4.1-4.8)
+// 5. функция, когда при закрытии модалки ее содержимое удаляется (п. 5.1-)
+// 6. функция, когда при закрытии модалки ее содержимое сохраняется с помощью json stringeFi (п. 6.1-)
