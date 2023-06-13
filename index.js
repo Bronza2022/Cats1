@@ -141,7 +141,7 @@ const openModalHandler = (e) => { // 2.3 Открытие модального �
     const dataFromLS = localStorage.getItem(CREATE_FORM_LS_KEY)  //  6.10
 
     const preparedDataFromLS = dataFromLS && JSON.parse(dataFromLS)    // 6.13
-    console.log({ preparedDataFromLS })  // 6.14
+    console.log({ preparedDataFromLS })  // 6.14 -ь 
 
     if (preparedDataFromLS) {                     // 6.15
       Object.keys(preparedDataFromLS).forEach((key) => {
