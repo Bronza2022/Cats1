@@ -1,8 +1,9 @@
 console.log('work')
 const $wr = document.querySelector('[data-wr]')
-//const $createCatForm = document.forms.createCatForm
 const $modalWr = document.querySelector('[data-modalWr]') // 2.8 Здесь будем обращаться напрямую к элементам
 const $modalContent = document.querySelector('[data-modalContent]') // 2.9 Здесь будем обращаться напрямую к элементам
+
+const CREATE_FORM_LS_KEY = 'CREATE_FORM_LS_KEY' // 6.11
 
 console.log($modalContent, $modalWr) // 2.10 Проверяем, нашли мы элементы или нет.
 
@@ -102,14 +103,6 @@ const submitCreateCatHandler = (e) => { // 2.12 Создадим 'const submitCr
 
   let formDataObject = formatCreateFormData(Object.fromEntries(new FormData(e.target).entries())) // 6.4
 
-  formDataObject = {   // 6.2
-    ...formDataObject,
-    id: +formDataObject.id,
-    rate: +formDataObject.rate,
-    age: +formDataObject.age,
-    favorite: !!formDataObject.favorite,
-  }
-
   fetch('https://cats.petiteweb.dev/api/single/Bronza2022/add/', {
     method: 'POST',
     headers: {
@@ -132,25 +125,38 @@ const clickModalWrHandler = (e) => { // 4.1
     $modalWr.classList.add('hidden') // 4.6  Закрываем модалку
     $modalWr.removeEventListener('click', clickModalWrHandler) // 4.7
     $modalContent.innerHTML = '' // 5.5 Когда модалка закрывается, чистится все содержимое.
-    // $createCatForm.removeEventListener('submit', submitCreateCatHandler) // 4.8. 5.4 Строка не нужна, потому что мы будем физически удалять элементы с разметки и браузер будет удалять все обработчики события за нас.
   }
 }
 
 const openModalHandler = (e) => { // 2.3 Открытие модального окна. Функция, которую мы укажем по событию (e)
   const targetModalName = e.target.dataset.openmodal // 2.4. 'dataset' будет называться 'openmodal'
+ 
   if (targetModalName === 'createCat') { // 2.5 «Если это строка 'createCat', то будем делать какие-то действия.
     $modalWr.classList.remove('hidden') // 2.11 по умолчанию есть класс 'hidden' и его надо удалить
     $modalWr.addEventListener('click', clickModalWrHandler) // 4.2
 
     $modalContent.insertAdjacentHTML('afterbegin', getCreateCatFormHTML()) // 5.2
-    const $createCatForm = document.forms.createCatForm // 5.3
-    $createCatForm.addEventListener('submit', submitCreateCatHandler) // 2.13 обработчик события
-    $createCatForm.addEventListener('change', (changeEvent) => { // 6.1
+    const $createCatForm = document.forms.createCatForm // 5.3, 6.16
+
+    const dataFromLS = localStorage.getItem(CREATE_FORM_LS_KEY)  //  6.10
+
+    const preparedDataFromLS = dataFromLS && JSON.parse(dataFromLS)    // 6.13
+    console.log({ preparedDataFromLS })  // 6.14 -ь 
+
+    if (preparedDataFromLS) {                     // 6.15
+      Object.keys(preparedDataFromLS).forEach((key) => {
+        $createCatForm[key].value = preparedDataFromLS[key]
+      })
+    }
+
+    //const $createCatForm = document.forms.createCatForm // 5.3   6.9 
+    $createCatForm.addEventListener('submit', submitCreateCatHandler) // 2.13, 5.4 обработчик события
+    $createCatForm.addEventListener('change', () => { // 6.1       6.17
       //console.log(changeEvent) // 6.6 удаляем
       const formattedData = formatCreateFormData(Object.fromEntries(new FormData($createCatForm).entries())) // 6.5
     
-      localStorage.setItem('createCatForm', JSON.stringify(formattedData))
-      //console.log({ formattedData });
+      localStorage.setItem(CREATE_FORM_LS_KEY, JSON.stringify(formattedData)) // 6.8, 6.12
+      //console.log({ formattedData }); // 6.7 удаляем
     })
   }
 }
@@ -163,7 +169,6 @@ document.addEventListener('keydown', (e) => { // 3.1 Вешаем обработ
   if (e.key === 'Escape') {
     $modalWr.classList.add('hidden') // 3.2 Чтобы закрыть модалку добавляем класс 'hidden'.
     $modalWr.removeEventListener('click', clickModalWrHandler) // 4.3
-    // $createCatForm.removeEventListener('submit', submitCreateCatHandler) // 4.4. 5.4 Строка не нужна, потому что мы будем физически удалять элементы с разметки и браузер будет удалять все обработчики события за нас.
     $modalContent.innerHTML = '' // 5.5 Когда модалка закрывается, чистится все содержимое.
   }
 })
